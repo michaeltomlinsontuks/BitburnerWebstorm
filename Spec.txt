@@ -1,0 +1,298 @@
+Goal: WebStorm Plugin with all the functionality as the VSCode Extension.
+
+Details for the VSCode Extension and the Remote API are below.
+
+
+Visual Studio Code Extension
+One user created a Bitburner extension for the Visual Studio Code (VSCode) editor.
+
+This extension includes several features such as:
+
+Dynamic RAM calculation
+RAM Usage breakdown
+Typescript definition files with jsdoc comments
+Netscript syntax highlighting
+
+Hello, I am leaving here the Visual Studio Code Dynamic RAM calculation extension for typescript/pure javascript compatible (derivatives like flowscript not tested but should work) I was working on.
+
+NEW UPDATE 03/05/2022
+
+Warning, partially deprecated since Monaco inclusion as the game script editor
+
+Features:
+
+Dynamic RAM Calculation (Shows in the status bar)
+
+Import RAM Usage
+
+RAM breakdown of functions used
+
+Can calculate the RAM for all Bitburner API
+
+Variable highlighter (opt-in)
+
+Automatic generation of .ns files with all imports with .ns extension (opt-in)
+
+RAM cost updater/checker [in case of a new game version] (opt-in)
+
+Download:
+
+STABLE: https://www.mediafire.com/file/jcudjjaadmg2z8k/netscript2-memory-counter-1.1.2.vsix/file
+
+Known Issues:
+
+Import highlight is not updated unless imports are updated (don't add extra spaces between imports or something alike)
+
+The extension was not tested with remote files/shares for files nor classes nor flow.
+
+Doesn't support .jsx .tsx files. (and not expected to support it)
+
+Doesn't support circular references
+
+Partially supports duplicate imports
+
+Doesn't support export expressions or default exports
+
+Release Notes:
+
+1.1.2 - 03/05/2022
+
+Updated to Bitburner v1.6.3
+
+Fix some more startup issues
+
+Fix ram updater
+
+Changed file hash algorithm
+
+Partially moved to vscode filesystem api
+
+1.1.1 - 24/10/2020
+
+Some more internal refactoring and performance improvement
+
+Fix some startup issues
+
+Changed RAM breakdown to a webview to improve readability and possibly to expand on it later
+
+1.1.0 - 29/05/2020
+
+Some more internal refactoring and performance improvement
+
+Slimmer package
+
+Imports are now hash-ed for the current session (until you close vscode) and verified for changes in the background
+
+Now ""empty"" functions/namespaces in the ram breakdown are not shown
+
+Support for workspaces
+
+Added version migration code (per language/folder configuration is not supported at this time, change settings manually in that case)
+
+Fixed duplicate removal that messed up some RAM calculations
+
+Fixed configurations names to be more consistent, changed: CreateNSFiles to createNSFiles and disableHighlight to enableHighlight (property is reversed and so is the default value)
+
+Changed RAM cost parsing to the game cost file
+
+Added script(code) parsing error feedback [current file only, for now] (disabled by default)
+
+Added RAM cost updater/checker (disabled by default)
+
+Other minor changes & fixes
+
+1.0.9 16/07/2019
+
+Fixed RAM breakdown
+
+Updated to Bitburner v0.47.2
+
+1.0.8 28/06/2019
+
+Fixed duplicate import timeout warnings
+
+Internal Refactoring and test creation (In progress)
+
+Now Decorators also show import timeouts
+
+Variable highlighter
+
+1.0.7 17/05/2019
+
+Improved 10x code analysis times by using a dedicaded parser
+
+Fixed some more problems with imports that contain directories (ej: lib\script)
+
+Updated to Bitburner v0.47.0
+
+Removed Netscript2Mem.insideBitNode4 configuration as the singularity functions now don't have distinction between BitNodes
+
+1.0.6 11/05/2019
+
+Fix: Overloads of a function were counting the ram eg: scp
+
+Fix: Use same type of quotes when generating .ns files instead of assuming "
+
+Changed back to integer costs of functions internally to prevent possible errors with floats due to decimal costs
+
+Changed code analysis from exponential recursive to iterative recursive to prevent possible stack overflows in very nested code and improve performance (3ms -> 1ms), code parsing times remain the same.
+
+1.0.5 03/05/2019
+
+Added .ns to default extensions to parse through.
+
+Fixed problem with decimal cost functions reporting incorrect RAM usage
+
+1.0.4 03/05/2019
+
+Fixed hacknet.spendHashes() function
+
+Modified .ns file creation to pure node solution because visual studio code was sloopy on saving files and sometimes leaved saved .ns files inside the editor. (Because it doesn't have any real file save/close API outside of some hackish workarounds)
+
+Added Extension logo image
+
+1.0.3 29/04/2019 - Fixed some problems with imports that contain directories (ej: lib\script.js)
+
+1.0.2 25/04/2019 - Added window and document variable cost
+
+1.0.1 25/04/2019 - Fixed duplicate cost of most functions
+
+1.0.0 24/04/2019 - Initial release
+
+Remote API
+All versions of Bitburner can use websockets to connect to a server. That server can then perform a number of actions. Most commonly this is used in conjunction with an external text editor or API in order to make writing scripts easier, or even use typescript.
+
+This API uses the JSON RPC 2.0 protocol. Inputs are in the following form:
+
+{
+    "jsonrpc": "2.0",
+    "id": number,
+    "method": string,
+    "params": any
+}
+Outputs:
+
+{
+    "jsonrpc": "2.0",
+    "id": number,
+    "result": any,
+    "error": any
+}
+Methods
+pushFile
+Create or update a file.
+
+{
+    "jsonrpc": "2.0",
+    "id": number,
+    "method": "pushFile",
+    "params": {
+        filename: string;
+        content: string;
+        server: string;
+    }
+}
+{
+    "jsonrpc": "2.0",
+    "id": number,
+    "result": "OK"
+}
+getFile
+Read a file and it’s content.
+
+{
+    "jsonrpc": "2.0",
+    "id": number,
+    "method": "getFile",
+    "params": {
+        filename: string;
+        server: string;
+    }
+}
+{
+    "jsonrpc": "2.0",
+    "id": number,
+    "result": string
+}
+deleteFile
+Delete a file.
+
+{
+    "jsonrpc": "2.0",
+    "id": number,
+    "method": "deleteFile",
+    "params": {
+        filename: string;
+        server: string;
+    }
+}
+{
+    "jsonrpc": "2.0",
+    "id": number,
+    "result": "OK"
+}
+getFileNames
+List all file names on a server.
+
+{
+    "jsonrpc": "2.0",
+    "id": number,
+    "method": "getFileNames",
+    "params": {
+        server: string;
+    }
+}
+{
+    "jsonrpc": "2.0",
+    "id": number,
+    "result": string[]
+}
+getAllFiles
+Get the content of all files on a server.
+
+{
+    "jsonrpc": "2.0",
+    "id": number,
+    "method": "getAllFiles",
+    "params": {
+        server: string;
+    }
+}
+{
+    "jsonrpc": "2.0",
+    "id": number,
+    "result": {
+        filename: string,
+        content: string
+    }[]
+}
+calculateRam
+Calculate the in-game ram cost of a script.
+
+{
+    "jsonrpc": "2.0",
+    "id": number,
+    "method": "calculateRam",
+    "params": {
+        filename: string;
+        server: string;
+    }
+}
+{
+    "jsonrpc": "2.0",
+    "id": number,
+    "result": number
+}
+getDefinitionFile
+Get the definition file of the API.
+
+{
+    "jsonrpc": "2.0",
+    "id": number,
+    "method": "getDefinitionFile"
+}
+{
+    "jsonrpc": "2.0",
+    "id": number,
+    "result": string
+}
